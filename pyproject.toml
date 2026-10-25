@@ -1,0 +1,21 @@
+[project]
+name = "kbinxml"
+version = "2.1"
+description = "Decoder/encoder for Konami's binary XML format"
+readme = "README.md"
+authors = [{ name = "mon", email = "me@mon.im" }]
+dependencies = ["lxml"]
+requires-python = ">=3.10"
+
+[project.urls]
+Homepage = "https://github.com/mon/kbinxml/"
+
+[project.scripts]
+kbinxml = "kbinxml:main"
+
+[build-system]
+requires = ["setuptools>=61"]
+build-backend = "setuptools.build_meta"
+
+[tool.setuptools]
+packages = ["kbinxml"]
