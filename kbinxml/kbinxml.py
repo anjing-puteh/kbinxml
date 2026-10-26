@@ -46,12 +46,20 @@ class KBinException(Exception):
 
 
 class KBinXML:
-    def __init__(self, input, convert_illegal_things=False):
+    def __init__(
+        self,
+        input,
+        convert_illegal_things=False,
+        force_binary_encoding: str | None = None,
+    ):
         """If `convert_illegal_things` is true,
         - Any shift-jis string that cannot be decoded as shift-jis will
           try to be decoded as utf-8
         - If a node name is invalid (for example, it starts with a number),
           the name will be prefixed with an underscore
+
+        `force_binary_encoding` can be used to override the stated encoding for
+        binary files, because sometimes they lie :(
         """
         self.convert_illegal_things = convert_illegal_things
         if isinstance(input, etree._Element):
@@ -59,7 +67,7 @@ class KBinXML:
         elif isinstance(input, etree._ElementTree):
             self.xml_doc = input.getroot()
         elif KBinXML.is_binary_xml(input):
-            self.from_binary(input)
+            self.from_binary(input, force_encoding=force_binary_encoding)
         else:
             self.from_text(input)
 
@@ -330,7 +338,7 @@ class KBinXML:
         self.nodeBuf.append_u32(self.dataSize)
         return bytes(header.data + self.nodeBuf.data + self.dataBuf.data)
 
-    def from_binary(self, input):
+    def from_binary(self, input, force_encoding: str | None = None):
         self.xml_doc = etree.Element("root")
         node = self.xml_doc
 
@@ -344,6 +352,9 @@ class KBinXML:
         encoding_key = self.nodeBuf.get_u8()
         assert self.nodeBuf.get_u8() == 0xFF ^ encoding_key
         self.encoding = encoding_strings[encoding_key]
+        if force_encoding:
+            self.stated_encoding = self.encoding
+            self.encoding = force_encoding
 
         nodeEnd = self.nodeBuf.get_u32() + 8
         self.nodeBuf.end = nodeEnd
