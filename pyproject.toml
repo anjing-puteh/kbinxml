@@ -1,6 +1,6 @@
 [project]
 name = "kbinxml"
-version = "2.1"
+version = "2.2"
 description = "Decoder/encoder for Konami's binary XML format"
 readme = "README.md"
 authors = [{ name = "mon", email = "me@mon.im" }]
